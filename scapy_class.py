@@ -1,3 +1,12 @@
+#
+# Subject: Scapy gadget class
+# Date: 2022/10/17
+# Author: maoyi.fan@aegiscloud.com.tw
+# Rev.: v. 0.1
+#
+# ToDo's:
+#   1. add 802.1q VLAN tagged Ethernet frame example
+#
 import getopt
 import sys
 from enum import Enum
