@@ -1,21 +1,29 @@
 #
 # Subject: Scapy gadget class
 # Date: 2022/10/17
-# Author: maoyi.fan@aegiscloud.com.tw
-# Rev.: v. 0.1
+# Author: maoyi.fan@gmail.com
+# Rev.: v. 0.1a
 #
+# History
+#   v. 0.1: project launched
+# 
 # ToDo's:
 #   1. add 802.1q VLAN tagged Ethernet frame example
+#   2. modularize command syntax instruction
 #
 import getopt
 import sys
 from enum import Enum
 
 
+#
+# Enumeration class of scapy operations
+#
 class OpCode(Enum):
     PING = "ping"
     ARP = "arp"
     RARP = "rarp"
+    ETHER = "ether_frame_txrx"
 
 
 class ScapyInst:
@@ -25,21 +33,20 @@ class ScapyInst:
         self.dest_ip = ""
         self.src_mac = ""
         self.dest_mac = ""
+        self.ether_type = ""
         self.cmd_parser(argv)
 
     def cmd_parser(self, argv):
         try:
             opts, args = getopt.getopt(argv, "h",
-                                       ["ping", "arp",
+                                       ["ping", "arp", "ether_frame_txrx",
                                         "src_ip=", "dest_ip=", "src_mac=", "dest_mac=", "help"])
         except getopt.GetoptError:
-            print("Syntax: \n\tscapy_test.py --src_ip=<source IP> --dest_ip=<destination IP> "
-                  "--src_mac=<source MAC> --dest_mac=<destination MAC> -h")
+            self.cmd_syntax()
             sys.exit()
         for opt, arg in opts:
             if opt in ("-h", "--help"):
-                print("Syntax: \n\tscapy_test.py --src_ip=<source IP> --dest_ip=<destination IP> "
-                      "--src_mac=<source MAC> --dest_mac=<destination MAC> -h")
+                self.cmd_syntax()
                 sys.exit()
             elif opt in ("--src_ip"):
                 print("Source IP: {0}".format(arg))
@@ -47,12 +54,18 @@ class ScapyInst:
             elif opt in ("--dest_ip"):
                 print("Destination IP: {0}".format(arg))
                 self.set_dest_ip(arg)
-            elif opt in ("--ping"):
+            elif opt in ("--src_mac"):
+                print("Source MAC: {0}".format(arg))
+                self.set_source_mac(arg)
+            elif opt in ("--"+OpCode.PING.value):
                 print("Ping action...")
                 self.op_code="ping"
-            elif opt in ("--arp"):
+            elif opt in ("--"+OpCode.ARP.value):
                 print("ARP action...")
                 self.op_code="arp"
+            elif opt in ("--"+OpCode.ETHER.value):
+                print("Sending Ethernet Frame")
+                self.op_code=OpCode.ETHER.value
             else:
                 print("Command name:", opt)
 
@@ -62,7 +75,7 @@ class ScapyInst:
     def set_dest_ip(self, dip):
         self.dest_ip = dip
 
-    def set_src_mac(self, smac):
+    def set_source_mac(self, smac):
         self.src_mac = smac
 
     def set_dest_mac(self, dmac):
@@ -73,3 +86,12 @@ class ScapyInst:
 
     def get_dest_ip(self):
         return self.dest_ip
+
+    def cmd_syntax(self):
+        print("Syntax: \n\tscapy_test.py --op_code --src_ip=<source IP> --dest_ip=<destination IP> "
+              "--src_mac=<source MAC> --dest_mac=<destination MAC> --ether_type=<type> -h")
+        print("\top_code: \n"
+              "\t\tping: sending a ICMP ping packet\n"
+              "\t\tarp: sending an ARP packet\n"
+              "\t\trarp: sending an RARP packet\n"
+              "\t\tether_frame_txrx: sending a layer 2 packet of specified Ether Type")

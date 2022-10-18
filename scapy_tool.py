@@ -1,8 +1,11 @@
 #
 # Subject: A simple gadget set demonstrating the use of scapy
-# Date: 2022/10/17
-# Author: maoyi.fan@aegiscloud.com.tw
-# Rev.: v. 0.1
+# Date: 2022/10/18
+# Author: maoyi.fan@gmail.com
+# Rev.: v. 0.1a
+#
+# History:
+#    v. 0.1: project launched
 #
 # ToDo's:
 #   1. add 802.1q VLAN tagged Ethernet frame example
@@ -23,8 +26,21 @@ def main(argv):
             print("{0} is at {1} ".format(scapy_inst.dest_ip, scapy_inst.dest_mac))
         elif scapy_inst.op_code == OpCode.RARP.value:
             scapy_rarp(scapy_inst)
+        elif scapy_inst.op_code == OpCode.ETHER.value:
+            scapy_ether_txrx(scapy_inst)
     else:
         print("Missing scapy operation!")
+
+
+#
+#
+#
+def scapy_ether_txrx(scapy_inst):
+    print("Running ethernet frame txrx...")
+    tcp_pkt = scapy.TCP(sport=135, dport=135)
+    ip_pkt = scapy.IP(src=scapy_inst.src_ip, dst=scapy_inst.dest_ip)
+    xeth = scapy.Ether(src=scapy_inst.src_mac)/ip_pkt/tcp_pkt
+    scapy.sendp(xeth, count=5)
 
 
 #
@@ -58,4 +74,3 @@ def scapy_rarp(scapy_inst):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-    
