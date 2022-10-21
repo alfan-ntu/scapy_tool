@@ -6,10 +6,11 @@
 #
 # History
 #   v. 0.1: project launched
-# 
+#
 # ToDo's:
 #   1. add 802.1q VLAN tagged Ethernet frame example
-#   2. modularize command syntax instruction
+#   2. display packets to be sent and packets received
+#   3. add a script file support 
 #
 import getopt
 import sys
