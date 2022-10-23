@@ -1,0 +1,8 @@
+source_ip  = 192.168.1.53
+source_mac = DC:71:96:04:02:D1
+dest_ip    = 192.168.1.13
+dest_mac   = 90:18:0E:E2:3E:FD
+op         = ether_txrx
+vlan       = Yes
+vlan_tpid  = 0xAB
+vlan_tci   = 0xCD
