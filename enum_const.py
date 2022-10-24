@@ -23,5 +23,20 @@ class OpCode(Enum):
     ARP = "arp"
     RARP = "rarp"
     ETHER = "ether_txrx"
+    PORT_SCAN = "port_scan"
+    HELP = "help"
 
 
+#
+# Enumeration class of parameters to perform scapy operations
+#
+class ParamCode(Enum):
+    SOURCE_PORT = "src_port"
+    DESTINATION_PORT = "dest_port"
+    SOURCE_IP = "src_ip"
+    DESTINATION_IP = "dest_ip"
+    SOURCE_MAC = "src_ip"
+    VLAN_TAG = "vlan"           # Yes/No; True/False
+    VLAN_TPID = "vlan_tpid"     # VLAN Tag Protocol ID: 0x8100
+    VLAN_TCI = "vlan_tci"       # VLAN Tag Control Information
+    SCRIPT_FILE = "file"

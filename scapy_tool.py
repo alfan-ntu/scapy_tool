@@ -10,7 +10,7 @@
 # ToDo's:
 #   1. add 802.1q VLAN tagged Ethernet frame example
 #   2. display packets to be sent and packets received
-#   3. add a script file support
+#   3. add another scapy widget 'port scanner'
 #
 import scapy.all as scapy
 import sys
@@ -32,9 +32,17 @@ def main(argv):
         #     scapy_rarp(scapy_inst)
         elif scapy_inst.op_code == OpCode.ETHER.value:
             scapy_ether_txrx(scapy_inst, True)
+        elif scapy_inst.op_code == OpCode.PORT_SCAN.value:
+            scapy_port_scan(scapy_inst, False)
     else:
         print("Missing scapy operation!")
 
+
+#
+#
+#
+def scapy_port_scan(scapy_inst, show_tx=False):
+    print("Target IP: {0}; Start port: {1}; End port: {2} ".format(scapy_inst.dest_ip, scapy_inst.start_port, scapy_inst.end_port))
 
 #
 #
