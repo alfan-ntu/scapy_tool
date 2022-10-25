@@ -1,5 +1,7 @@
+src_port   = 1135
 src_ip  = 192.168.1.53
 src_mac = DC:71:96:04:02:D1
+dest_port  = 1135
 dest_ip    = 192.168.1.13
 dest_mac   = 90:18:0E:E2:3E:FD
 op         = ether_txrx

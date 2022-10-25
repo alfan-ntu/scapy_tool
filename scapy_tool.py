@@ -27,8 +27,8 @@ def main(argv):
         elif scapy_inst.op_code == OpCode.ARP.value:
             scapy_arp(scapy_inst)
             print("{0} is at {1} ".format(scapy_inst.dest_ip, scapy_inst.dest_mac))
-        # elif scapy_inst.op_code == OpCode.RARP.value:
-        #     scapy_rarp(scapy_inst)
+        elif scapy_inst.op_code == OpCode.RARP.value:
+            scapy_rarp(scapy_inst)
         elif scapy_inst.op_code == OpCode.ETHER.value:
             scapy_ether_txrx(scapy_inst, True)
         elif scapy_inst.op_code == OpCode.PORT_SCAN.value:
@@ -52,16 +52,24 @@ def scapy_port_scan(scapy_inst, show_tx=False):
             scapy.sr(scapy.IP(dst=dest_ip)/scapy.TCP(dport=response.sport, flags='R'), timeout=0.5, verbose=0)
         else:
             print('.', end='')
-    print("Port scan completes!")
+    print("\nPort scan completes!")
+
 
 #
 #
 #
 def scapy_ether_txrx(scapy_inst, show_tx=False):
     print("Running ethernet frame txrx...")
-    tcp_pkt = scapy.TCP(sport=135, dport=135)
+    tcp_pkt = scapy.TCP(sport=int(scapy_inst.start_port),
+                        dport=int(scapy_inst.end_port))
     ip_pkt = scapy.IP(src=scapy_inst.src_ip, dst=scapy_inst.dest_ip)
-    xeth = scapy.Ether(src=scapy_inst.src_mac)/ip_pkt/tcp_pkt
+    if scapy_inst.vlan:
+        print("To embed VLAN tag into the Ethernet frame...")
+        xeth = scapy.Ether(src=scapy_inst.src_mac) /scapy.Dot1Q(vlan=42) / ip_pkt / tcp_pkt
+    else:
+        print("No need to embed VLAN tag into the Ethernet frame...")
+        xeth = scapy.Ether(src=scapy_inst.src_mac) / ip_pkt / tcp_pkt
+
     if show_tx:
         xeth.show()
     scapy.sendp(xeth, count=5)
