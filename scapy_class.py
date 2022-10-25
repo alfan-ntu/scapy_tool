@@ -10,7 +10,6 @@
 # ToDo's:
 #   1. add 802.1q VLAN tagged Ethernet frame example
 #   2. display packets to be sent and packets received
-#   3. add another scapy widget 'port scanner'
 #
 import getopt
 import sys
@@ -72,29 +71,32 @@ class ScapyInst:
         self.src_mac = ""
         self.dest_mac = ""
         self.ether_type = ""
-        self.vlan = False
+        self.vlan = False           # Default to not VLAN tagged
         self.vlan_tpid = ""
         self.vlan_tci = ""
         self.path_to_file = ""
         self.recipe = []
+        self.verbose = False        # default not to dump scapy instance
 
     def dump_scapy_inst(self):
-        print("Op Code: ", self.op_code)
-        print("Source/Start Port: ", self.start_port)
-        print("Dest/End Port: ", self.end_port)
-        print("Source IP: ", self.src_ip)
-        print("Destination IP: ", self.dest_ip)
-        print("Source MAC: ", self.src_mac)
-        print("Destination MAC: ", self.dest_mac)
-        if self.vlan:
-            print("VLAN ID: ", self.vlan_tpid)
-            print("VLAN TCI: ", self.vlan_tci)
+        if self.verbose:
+            print(">>> Dumping Scapy Operation Instance")
+            print("\tOp Code: ", self.op_code)
+            print("\tSource/Start Port: ", self.start_port)
+            print("\tDest/End Port: ", self.end_port)
+            print("\tSource IP: ", self.src_ip)
+            print("\tDestination IP: ", self.dest_ip)
+            print("\tSource MAC: ", self.src_mac)
+            print("\tDestination MAC: ", self.dest_mac)
+            if self.vlan:
+                print("\tVLAN ID: ", self.vlan_tpid)
+                print("\tVLAN TCI: ", self.vlan_tci)
+            print(">>> End of Scapy Instance Dumping\n")
 
     def cmd_parser(self, argv):
         try:
             longopts = compose_longopts()
-            print("longopts = ", longopts)
-            opts, args = getopt.getopt(argv, "hf:", longopts)
+            opts, args = getopt.getopt(argv, "hf:v:", longopts)
         except getopt.GetoptError:
             cmd_syntax()
             sys.exit()
@@ -106,32 +108,44 @@ class ScapyInst:
                 self.path_to_file = arg
                 if not self.script_parser():
                     print("Invalid external script file: {0}".format(arg))
+            elif opt in ("-v", "--verbose"):
+                if arg.upper() == "YES" or arg.upper() == "TRUE":
+                    self.verbose = True
             elif opt in ParamCode.SOURCE_PORT.value:
                 print("Srouce/start port: {0}".format(arg))
-                self.start_port
-            elif opt in ("dest_port"):
+                self.set_source_port(arg)
+            elif opt in ('--'+ParamCode.DESTINATION_PORT.value):
                 print("Dest/end port: {0}".format(arg))
-                self.end_port
-            elif opt in ("--src_ip"):
+                self.set_dest_port(arg)
+            elif opt in ('--'+ParamCode.SOURCE_IP.value):
                 print("Source IP: {0}".format(arg))
                 self.set_source_ip(arg)
-            elif opt in ("--dest_ip"):
+            elif opt in ('--'+ParamCode.DESTINATION_IP.value):
                 print("Destination IP: {0}".format(arg))
                 self.set_dest_ip(arg)
-            elif opt in ("--src_mac"):
+            elif opt in ('--'+ParamCode.SOURCE_MAC.value):
                 print("Source MAC: {0}".format(arg))
                 self.set_source_mac(arg)
-            elif opt in ("--"+OpCode.PING.value):
+            elif opt in ('--'+OpCode.PING.value):
                 print("Ping action...")
-                self.op_code="ping"
-            elif opt in ("--"+OpCode.ARP.value):
+                self.op_code=OpCode.PING.value
+            elif opt in ('--'+OpCode.ARP.value):
                 print("ARP action...")
-                self.op_code="arp"
-            elif opt in ("--"+OpCode.ETHER.value):
-                print("Sending Ethernet Frame")
+                self.op_code=OpCode.ARP.value
+            elif opt in ('--'+OpCode.ETHER.value):
+                print("Sending Ethernet Frame action...")
                 self.op_code=OpCode.ETHER.value
+            elif opt in ('--'+OpCode.PORT_SCAN.value):
+                print("Port Scan action...")
+                self.op_code=OpCode.PORT_SCAN.value
             else:
                 print("Command name:", opt)
+
+    def set_source_port(self, sport):
+        self.start_port = sport
+
+    def set_dest_port(self, dport):
+        self.end_port = dport
 
     def set_source_ip(self, sip):
         self.src_ip = sip
@@ -150,20 +164,6 @@ class ScapyInst:
 
     def get_dest_ip(self):
         return self.dest_ip
-
-    # # command syntax output
-    # def cmd_syntax(self):
-    #     print("Syntax: \n\tscapy_test.py --op_code --src_ip=<source IP> --dest_ip=<destination IP> "
-    #           "--src_mac=<source MAC> --dest_mac=<destination MAC> --ether_type=<type> -h")
-    #     print("\top_code: \n"
-    #           "\t\tping: sending a ICMP ping packet\n"
-    #           "\t\tarp: sending an ARP packet\n"
-    #           "\t\trarp: sending an RARP packet\n"
-    #           "\t\tether_txrx: sending a layer 2 packet of specified Ether Type\n"
-    #           "\t\tscan_port: scanning all listening ports on the target IP\n")
-
-    # def compose_longopts(self, argv):
-
 
     def script_parser(self):
         valid_script = True if os.path.exists(self.path_to_file) else False
@@ -186,24 +186,24 @@ class ScapyInst:
             if is_an_opcode(token):
                 self.op_code = token[1]
             else:
-                if token[0] == "src_port":
+                if token[0] == ParamCode.SOURCE_PORT.value:
                     self.start_port = token[1]
-                elif token[0] == "dest_port":
+                elif token[0] == ParamCode.DESTINATION_PORT.value:
                     self.end_port = token[1]
-                elif token[0] == "source_ip":
+                elif token[0] == ParamCode.SOURCE_IP.value:
                     self.src_ip = token[1]
-                elif token[0] == "dest_ip":
+                elif token[0] == ParamCode.DESTINATION_IP.value:
                     self.dest_ip = token[1]
-                elif token[0] == "source_mac":
+                elif token[0] == ParamCode.SOURCE_MAC.value:
                     self.src_mac = token[1]
-                elif token[0] == "dest_mac":
+                elif token[0] == ParamCode.DESTINATION_MAC.value:
                     self.dest_mac = token[1]
-                elif token[0] == "vlan":
+                elif token[0] == ParamCode.VLAN_TAG.value:
                     if token[1].upper() == "YES" or token[1].upper() == "TRUE":
                         self.vlan = True
-                elif token[0] == "vlan_tpid":
+                elif token[0] == ParamCode.VLAN_TPID.value:
                     self.vlan_tpid = token[1]
-                elif token[0] == "vlan_tci":
+                elif token[0] == ParamCode.VLAN_TCI.value:
                     self.vlan_tci = token[1]
                 else:
                     pass

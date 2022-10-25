@@ -1,9 +1,11 @@
-source_ip  = 192.168.1.104
+src_ip     = 192.168.1.104
 dest_ip    = 192.168.1.113
-source_mac = DC:71:96:04:02:D1
+src_mac = DC:71:96:04:02:D1
 dest_mac   = 60:A4:4C:A7:20:2D
-# test comment
-op         = ether_txrx
+# comment for description
+op         = port_scan
+src_port   = 1
+dest_port  = 400
 vlan       = Yes
 vlan_tpid  = 0xAB
 vlan_tci   = 0xCD
