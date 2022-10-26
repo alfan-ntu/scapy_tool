@@ -1,0 +1,14 @@
+src_port   = 1135
+src_ip  = 192.168.1.3
+src_mac = 5C:92:5E:D2:E2:02
+dest_port  = 1135
+dest_ip    = 192.168.1.13
+dest_mac   = 90:18:0E:E2:3E:FD
+op         = ether_txrx
+vlan       = Yes
+vlan_vid   = 0xB2A
+vlan_pcp   = 0x1
+vlan_dei   = 0x1
+# proprietary protocol fields
+dsid = 0x3B
+ssid = 0x2A

@@ -1,15 +1,15 @@
 #
 # Subject: Scapy gadget class
-# Date: 2022/10/17
+# Date: 2022/10/26
 # Author: maoyi.fan@gmail.com
-# Rev.: v. 0.1a
+# Rev.: v. 0.1b
 #
 # History
+#   v. 0.1b 2022/10/26: Multiplexing through VLAN tag
 #   v. 0.1: project launched
 #
 # ToDo's:
-#   1. add 802.1q VLAN tagged Ethernet frame example
-#   2. display packets to be sent and packets received
+#   - display packets to be sent and packets received
 #
 import getopt
 import sys
@@ -72,11 +72,15 @@ class ScapyInst:
         self.dest_mac = ""
         self.ether_type = ""
         self.vlan = False           # Default to not VLAN tagged
-        self.vlan_tpid = ""
-        self.vlan_tci = ""
+        self.vlan_vid = ""
+        self.vlan_pcp = ""
+        self.vlan_dei = ""
         self.path_to_file = ""
         self.recipe = []
         self.verbose = False        # default not to dump scapy instance
+        self.pproto = False         # Default not to support proprietary protocol
+        self.dsid = ""
+        self.ssid = ""
 
     def dump_scapy_inst(self):
         if self.verbose:
@@ -89,8 +93,12 @@ class ScapyInst:
             print("\tSource MAC: ", self.src_mac)
             print("\tDestination MAC: ", self.dest_mac)
             if self.vlan:
-                print("\tVLAN ID: ", self.vlan_tpid)
-                print("\tVLAN TCI: ", self.vlan_tci)
+                print("\tVLAN ID: ", self.vlan_vid)
+                print("\tVLAN PCP: ", self.vlan_pcp)
+                print("\tVLAN DEI: ", self.vlan_dei)
+            if self.pproto:
+                print("\tDSID: ", self.dsid)
+                print("\tSSID: ", self.ssid)
             print(">>> End of Scapy Instance Dumping\n")
 
     def cmd_parser(self, argv):
@@ -167,7 +175,6 @@ class ScapyInst:
 
     def script_parser(self):
         valid_script = True if os.path.exists(self.path_to_file) else False
-        # ToDo's : add file token parser
         with open(self.path_to_file, 'r') as fp:
             while True:
                 line = fp.readline()
@@ -201,10 +208,22 @@ class ScapyInst:
                 elif token[0] == ParamCode.VLAN_TAG.value:
                     if token[1].upper() == "YES" or token[1].upper() == "TRUE":
                         self.vlan = True
-                elif token[0] == ParamCode.VLAN_TPID.value:
-                    self.vlan_tpid = token[1]
-                elif token[0] == ParamCode.VLAN_TCI.value:
-                    self.vlan_tci = token[1]
+                elif token[0] == ParamCode.VLAN_VLANID.value:
+                    self.vlan_vid = token[1]
+                elif token[0] == ParamCode.VLAN_PCP.value:
+                    self.vlan_pcp = token[1]
+                elif token[0] == ParamCode.VLAN_DEI.value:
+                    self.vlan_dei = token[1]
+                elif token[0] == ParamCode.VERBOSE.value:
+                    if token[1].upper() == "YES" or token[1].upper() == "TRUE":
+                        self.verbose = True
+                elif token[0] == ParamCode.PROP_PROTO.value:
+                    if token[1].upper() == "YES" or token[1].upper() == "TRUE":
+                        self.pproto = True
+                elif token[0] == ParamCode.DSID.value:
+                    self.dsid = token[1]
+                elif token[0] == ParamCode.SSID.value:
+                    self.ssid = token[1]
                 else:
                     pass
         return valid_script

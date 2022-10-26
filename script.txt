@@ -2,9 +2,18 @@ src_port   = 1135
 src_ip  = 192.168.1.53
 src_mac = DC:71:96:04:02:D1
 dest_port  = 1135
-dest_ip    = 192.168.1.13
+# destination information of ASUS Desktop
+# dest_ip    = 192.168.1.13
+# dest_mac   = 00:0C:29:EA:09:D4
+# destination information of Ubutu VM in ASUS Desktop
+dest_ip    = 192.168.1.41
 dest_mac   = 90:18:0E:E2:3E:FD
 op         = ether_txrx
-vlan       = Yes
-vlan_tpid  = 0xAB
-vlan_tci   = 0xCD
+vlan       = No
+vlan_vid   = 0xB2A
+vlan_pcp   = 0x1
+vlan_dei   = 0x1
+# proprietary protocol fields using VLAN multiplexing
+pproto = Yes
+dsid = 0x3B
+ssid = 0x2A

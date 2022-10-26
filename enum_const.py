@@ -1,16 +1,15 @@
 #
 # Subject: Scapy gadget constants
-# Date: 2022/10/21
+# Date: 2022/10/26
 # Author: maoyi.fan@gmail.com
-# Rev.: v. 0.1a
+# Rev.: v. 0.1b
 #
 # History
+#   v. 0.1b 2022/10/26: Multiplexing through VLAN tag
 #   v. 0.1: firstly created
 #
 # ToDo's:
-#   1. add 802.1q VLAN tagged Ethernet frame example
-#   2. display packets to be sent and packets received
-#   3. add a script file support
+#   - display packets to be sent and packets received
 #
 from enum import Enum
 
@@ -25,6 +24,7 @@ class OpCode(Enum):
     ETHER = "ether_txrx"
     PORT_SCAN = "port_scan"
     HELP = "help"
+    DUMMY = "dummy"
 
 
 #
@@ -37,8 +37,12 @@ class ParamCode(Enum):
     DESTINATION_IP = "dest_ip"
     SOURCE_MAC = "src_mac"
     DESTINATION_MAC = "dest_mac"
-    VLAN_TAG = "vlan"           # Yes/No; True/False
-    VLAN_TPID = "vlan_tpid"     # VLAN Tag Protocol ID: 0x8100
-    VLAN_TCI = "vlan_tci"       # VLAN Tag Control Information
+    VLAN_TAG = "vlan"               # Yes/No; True/False
+    VLAN_VLANID = "vlan_vid"        # VLAN ID: 12-bits
+    VLAN_PCP = "vlan_pcp"           # VLAN priority code: 0~7
+    VLAN_DEI = "vlan_dei"           # VLAN Drop eligible indicator: 1 bit
     SCRIPT_FILE = "file"
     VERBOSE = "verbose"
+    PROP_PROTO = "pproto"           # proprietary protocol
+    DSID = "dsid"                   # Dest. SID
+    SSID = "ssid"                   # Source SID
