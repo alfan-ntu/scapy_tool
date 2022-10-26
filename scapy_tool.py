@@ -74,14 +74,16 @@ def scapy_ether_txrx(scapy_inst, show_tx=False):
         xeth = scapy.Ether(src=scapy_inst.src_mac) / scapy.Dot1Q(vlan=vlan_id, id=dei, prio=prio) / ip_pkt / tcp_pkt
     elif scapy_inst.vlan:
         print("To embed VLAN tag into the Ethernet frame...")
-        xeth = scapy.Ether(src=scapy_inst.src_mac) /scapy.Dot1Q(vlan=42) / ip_pkt / tcp_pkt
+        dei = int(scapy_inst.vlan_dei, 16)
+        prio = int(scapy_inst.vlan_pcp, 16)
+        xeth = scapy.Ether(src=scapy_inst.src_mac) /scapy.Dot1Q(vlan=42, id=dei, prio=prio) / ip_pkt / tcp_pkt
     else:
         print("No need to embed VLAN tag into the Ethernet frame...")
         xeth = scapy.Ether(src=scapy_inst.src_mac) / ip_pkt / tcp_pkt
 
     if show_tx:
         xeth.show()
-    # scapy.sendp(xeth, count=5)
+    scapy.sendp(xeth, count=5)
 
 
 #
